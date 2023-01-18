@@ -3,10 +3,10 @@ import openai
 import gradio as gr
 
 #if you have OpenAI API key as an environment variable, enable the below
-#openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 #if you have OpenAI API key as a string, enable the below
-openai.api_key = "xxxxxx"
+#openai.api_key = "*****"
 
 start_sequence = "\nAI:"
 restart_sequence = "\nHuman: "
@@ -44,12 +44,13 @@ block = gr.Blocks()
 
 
 with block:
-    gr.Markdown("""<h1><center>Build Yo'own ChatGPT with OpenAI API & Gradio</center></h1>
-    """)
+    gr.Markdown("""<h1><center>Sid's ChatGPT Clone</center></h1>""")
+    gr.Markdown("""<h3><center>OpenAI API backend & Gradio frontend</center></h3>""")
+    
     chatbot = gr.Chatbot()
     message = gr.Textbox(placeholder=prompt)
     state = gr.State()
     submit = gr.Button("SEND")
-    submit.click(chatgpt_clone, inputs=[message, state], outputs=[chatbot, state])
+    submit.click(chatgpt_clone, inputs=[message, state], outputs=[chatbot, state])    
 
-block.launch(debug = True)
+block.launch(debug = True, server_name="0.0.0.0")
