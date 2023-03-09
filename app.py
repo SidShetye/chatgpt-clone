@@ -13,22 +13,38 @@ system_command = "The following is a conversation with an AI assistant. The assi
 messages = [
     {"role": "system", "content": system_command},
 ]
+chat_history = []
 
-def chatbot(input):
-    if input:
-        messages.append({"role": "user", "content": input})
-        chat = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", 
-            messages=messages
-        )
-        reply = chat.choices[0].message.content
-        messages.append({"role": "assistant", "content": reply})
-        return reply
+def askbot(input, state):
+    if len(messages) > 10:
+        messages.pop(1)
+        messages.pop(2)
+        messages.pop(3)
+    
+    messages.append({"role": "user", "content": input})
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages)
+    reply = response["choices"][0]["message"]["content"]
+    messages.append({"role": "assistant", "content": reply})
 
-inputs = gr.inputs.Textbox(lines=7, label="Chat with AI")
-outputs = gr.outputs.Textbox(label="Reply")
+    chat_history.append([input, reply])
+    return chat_history, state
 
-gr.Interface(fn=chatbot, inputs=inputs, outputs=outputs, title="AI Chatbot",
-             description="Ask anything you want",
-             theme="compact").launch(share=True)
-            
+with gr.Blocks() as demo:
+    gr.Markdown("""<h1><center>Sid's ChatGPT Clone</center></h1>""")
+    gr.Markdown("""<h3><center>OpenAI API backend & Gradio frontend</center></h3>""")
+
+    chatbot = gr.Chatbot()
+    state = gr.State([])
+    
+    with gr.Row():
+        txt = gr.Textbox(
+                show_label=False, 
+                placeholder="What kind of chatbot would you like to create? ",
+                value="Explain general relativity to a 5 year old. "
+                ).style(container=False)
+    
+    txt.submit(askbot, [txt, state], [chatbot, state])
+
+demo.launch()
