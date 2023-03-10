@@ -18,8 +18,6 @@ chat_history = []
 def askbot(input, state):
     if len(messages) > 10:
         messages.pop(1)
-        messages.pop(2)
-        messages.pop(3)
     
     messages.append({"role": "user", "content": input})
     response = openai.ChatCompletion.create(
@@ -31,20 +29,15 @@ def askbot(input, state):
     chat_history.append([input, reply])
     return chat_history, state
 
-with gr.Blocks() as demo:
+with gr.Blocks() as block:
     gr.Markdown("""<h1><center>Sid's ChatGPT Clone</center></h1>""")
     gr.Markdown("""<h3><center>OpenAI API backend & Gradio frontend</center></h3>""")
 
     chatbot = gr.Chatbot()
     state = gr.State([])
     
-    with gr.Row():
-        txt = gr.Textbox(
-                show_label=False, 
-                placeholder="What kind of chatbot would you like to create? ",
-                value="Explain general relativity to a 5 year old. "
-                ).style(container=False)
-    
-    txt.submit(askbot, [txt, state], [chatbot, state])
+    txt = gr.Textbox(placeholder="What do you want to discuss? ")
+    submit = gr.Button("SEND")
+    submit.click(askbot, [txt, state], [chatbot, state])
 
-demo.launch()
+block.launch()
