@@ -40,4 +40,4 @@ with gr.Blocks() as block:
     submit = gr.Button("SEND")
     submit.click(askbot, [txt, state], [chatbot, state])
 
-block.launch()
+block.launch(debug = True, server_name="0.0.0.0")
